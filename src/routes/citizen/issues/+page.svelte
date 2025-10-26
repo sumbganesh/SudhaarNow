@@ -323,17 +323,36 @@
 													<div class="flex space-x-2">
 														{#each issue.photos.slice(0, 3) as photo}
 															<div class="relative group">
-																<img 
-																	src={photo} 
-																	alt="Issue photo" 
-																	class="w-16 h-16 object-cover rounded border cursor-pointer hover:opacity-80 transition-opacity"
-																	onerror={(e) => {
-																		e.target.style.display = 'none';
-																		e.target.nextElementSibling.style.display = 'flex';
-																	}}
-																/>
-																<div class="w-16 h-16 bg-gray-200 rounded border flex items-center justify-center text-xs text-gray-500 hidden">
-																	Broken
+																<div class="w-16 h-16 bg-gray-100 rounded border flex items-center justify-center">
+																	<img 
+																		src={photo} 
+																		alt="" 
+																		class="w-full h-full object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+																		onerror={(e) => {
+																			const target = e.target as HTMLImageElement;
+																			if (target) {
+																				target.style.display = 'none';
+																				const nextElement = target.nextElementSibling as HTMLElement;
+																				if (nextElement) {
+																					nextElement.style.display = 'flex';
+																				}
+																			}
+																		}}
+																		onload={(e) => {
+																			const target = e.target as HTMLImageElement;
+																			if (target) {
+																				const nextElement = target.nextElementSibling as HTMLElement;
+																				if (nextElement) {
+																					nextElement.style.display = 'none';
+																				}
+																			}
+																		}}
+																	/>
+																	<div class="hidden w-full h-full bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
+																		<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+																		</svg>
+																	</div>
 																</div>
 															</div>
 														{/each}
