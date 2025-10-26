@@ -47,7 +47,8 @@
 		});
 	}
 
-	function getFilteredIssues() {
+	// Reactive statement for filtered issues
+	$: filteredIssues = (() => {
 		switch (activeTab) {
 			case 'pending':
 				return data.issues.filter(i => i.issue.status === 'pending');
@@ -60,7 +61,7 @@
 			default:
 				return data.issues;
 		}
-	}
+	})();
 
 	function calculateResolutionTime(issue: { issue: any; }) {
 		if (issue.issue.status === 'resolved' && issue.issue.actualResolutionDate) {
@@ -74,7 +75,6 @@
 	}
 
 	function createMapMarkers() {
-		const filteredIssues = getFilteredIssues();
 		mapMarkers = filteredIssues.map(issue => ({
 			lat: issue.issue.locationLat,
 			lng: issue.issue.locationLng,
@@ -227,25 +227,25 @@
 							<nav class="-mb-px flex space-x-8 px-4" aria-label="Tabs">
 								<button
 									class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm {activeTab === 'pending' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
-									on:click={() => activeTab = 'pending'}
+									onclick={() => activeTab = 'pending'}
 								>
-									Pending Issues
+									Pending
 								</button>
 								<button
 									class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm {activeTab === 'in_progress' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
-									on:click={() => activeTab = 'in_progress'}
+									onclick={() => activeTab = 'in_progress'}
 								>
-									Issues in Progress
+									In Progress
 								</button>
 								<button
 									class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm {activeTab === 'resolved' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
-									on:click={() => activeTab = 'resolved'}
+									onclick={() => activeTab = 'resolved'}
 								>
-									Resolved Issues
+									Resolved
 								</button>
 								<button
 									class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm {activeTab === 'map' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
-									on:click={() => activeTab = 'map'}
+									onclick={() => activeTab = 'map'}
 								>
 									Map View
 								</button>
@@ -282,8 +282,8 @@
 											<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
 											</svg>
-											<h3 class="mt-2 text-sm font-medium text-gray-900">No issues to display</h3>
-											<p class="mt-1 text-sm text-gray-500">Try switching to a different tab to see issues.</p>
+											<h3 class="mt-2 text-sm font-medium text-gray-900">No issues to display on map</h3>
+											<p class="mt-1 text-sm text-gray-500">No issues are available for the current filter. Try switching to a different tab to see issues.</p>
 										</div>
 									</div>
 								{/if}
@@ -291,7 +291,7 @@
 						{:else}
 							<!-- Issues List -->
 							<div class="divide-y divide-gray-200">
-								{#each getFilteredIssues() as { issue, category, postedBy, assignedTo }}
+								{#each filteredIssues as { issue, category, postedBy, assignedTo }}
 									<div class="px-4 py-4 sm:px-6">
 										<div class="flex items-center justify-between">
 											<div class="flex-1 min-w-0">
@@ -331,7 +331,7 @@
 																<div class="w-16 h-16 bg-gray-100 rounded border flex items-center justify-center">
 																	<img 
 																		src={photo} 
-																		alt="Issue photo" 
+																		alt="" 
 																		class="w-full h-full object-cover rounded"
 																		onerror={(e) => {
 																			const target = e.target as HTMLImageElement;
@@ -415,13 +415,33 @@
 										{/if}
 									</div>
 								{/each}
-								{#if getFilteredIssues().length === 0}
+								{#if filteredIssues.length === 0}
 									<div class="px-4 py-8 sm:px-6 text-center">
-										<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-										</svg>
-										<h3 class="mt-2 text-sm font-medium text-gray-900">No issues found</h3>
-										<p class="mt-1 text-sm text-gray-500">No issues match the current filter. Try switching to a different tab.</p>
+										{#if activeTab === 'pending'}
+											<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+											</svg>
+											<h3 class="mt-2 text-sm font-medium text-gray-900">No pending issues</h3>
+											<p class="mt-1 text-sm text-gray-500">All issues have been addressed or are currently being worked on.</p>
+										{:else if activeTab === 'in_progress'}
+											<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+											</svg>
+											<h3 class="mt-2 text-sm font-medium text-gray-900">No in progress issues</h3>
+											<p class="mt-1 text-sm text-gray-500">No issues are currently being worked on by authorities.</p>
+										{:else if activeTab === 'resolved'}
+											<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+											</svg>
+											<h3 class="mt-2 text-sm font-medium text-gray-900">No resolved issues</h3>
+											<p class="mt-1 text-sm text-gray-500">No issues have been resolved yet. Check back later!</p>
+										{:else}
+											<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+											</svg>
+											<h3 class="mt-2 text-sm font-medium text-gray-900">No issues found</h3>
+											<p class="mt-1 text-sm text-gray-500">No issues match the current filter. Try switching to a different tab.</p>
+										{/if}
 									</div>
 								{/if}
 							</div>
