@@ -63,6 +63,7 @@ export const load: PageServerLoad = async () => {
 	return {
 		issues,
 		topCitizens,
+		googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
 		stats: {
 			total: totalIssues,
 			resolved: resolvedIssues,
