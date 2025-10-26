@@ -37,13 +37,12 @@
 
 		<form class="mt-8 space-y-6" method="POST" use:enhance={() => {
 			isSubmitting = true;
-			return async ({ result }) => {
+			return async ({ result, update }) => {
+				// Always reset loading state
 				isSubmitting = false;
-				if (result.type === 'failure') {
-					// Form submission failed, keep isSubmitting false
-					return;
-				}
-				// Form submission succeeded, redirect will happen
+				
+				// Let the default behavior handle the result
+				await update();
 			};
 		}}>
 			{#if form?.message}
