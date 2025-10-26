@@ -35,7 +35,17 @@
 			</div>
 		</div>
 
-		<form class="mt-8 space-y-6" method="POST" use:enhance onsubmit={() => { isSubmitting = true; }}>
+		<form class="mt-8 space-y-6" method="POST" use:enhance={() => {
+			isSubmitting = true;
+			return async ({ result }) => {
+				isSubmitting = false;
+				if (result.type === 'failure') {
+					// Form submission failed, keep isSubmitting false
+					return;
+				}
+				// Form submission succeeded, redirect will happen
+			};
+		}}>
 			{#if form?.message}
 				<div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
 					{form.message}
